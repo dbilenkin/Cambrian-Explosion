@@ -1,0 +1,200 @@
+<html>
+	<head>
+		<title>Cambrian Explosion 1.61</title>
+
+
+		<!-- libs -->
+		<!--[if IE]><script type="text/javascript" src="lib/excanvas-compressed.js"></script><![endif]-->
+
+		<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js'></script>
+
+		<!-- <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js'></script>	-->
+		<script src='lib/jquery-ui-1.8.11.custom.min.js'></script>
+		<script type="text/javascript">
+		  $.noConflict();
+		  // Code that uses other library's $ can follow here.
+		</script>
+
+		<script src='lib/highcharts.js'></script>
+
+
+		<script src="http://ajax.googleapis.com/ajax/libs/prototype/1.6.0.2/prototype.js"></script>
+		<!-- <script src="lib/prototype-1.6.0.2.js"></script> -->
+
+		<!-- box2djs -->
+	  	<script src='lib/box2djs.js'></script>
+
+		<!-- my js -->
+
+		<script src='js/settings.js'></script>
+		<script src='js/controller.js'></script>
+		<script src='js/view.js'></script>
+		<script src='js/world.js'></script>
+		<script src='js/utilities.js'></script>
+		<script src='js/highcharts_graph.js'></script>
+		<script src='js/population.js'></script>
+		<script src='js/individual.js'></script>
+		<script src='js/individuals/segmented_individual.js'></script>
+		<script src='js/individuals/star_individual.js'></script>
+		<script src='js/individuals/quadruped_individual.js'></script>
+	    <script src='js/creature.js'></script>
+	    <script src='js/creatures/ring_creature.js'></script>
+	    <script src='js/creatures/worm_creature.js'></script>
+	    <script src='js/creatures/star_creature.js'></script>
+	    <script src='js/creatures/quadruped_creature.js'></script>
+
+
+
+		<link href="style/movement.css" rel="stylesheet" type="text/css" />
+		<link href="style/jquery-ui-1.8.11.custom.css" rel="stylesheet" type="text/css" />
+
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-22356148-1']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+
+		</script>
+  	</head>
+<body>
+
+  	<div id="content">
+  		<div id="header" class="">
+			<div id="titleItem"><a href="index.html" ></a></div>
+			<div class="menuItem"><a href="about.html" >About</a></div>
+			<div class="menuItem"><a href="contact.html" >Contact</a></div>
+		</div>
+		<div id="main" >
+			<div id="settingsAccordion">
+
+
+
+
+				<h3><a href="#">Creature Settings</a></h3>
+				<div id="creatureSettings">
+					Creature:
+					<select id="CreatureChoice" >
+						<option value="worm">Worm</option>
+						<option value="ring">Ring</option>
+						<option value="star">Star</option>
+						<option value="quadruped">Quadruped</option>
+					</select>
+					</br>
+					<div id="wormRingStarSettings" >
+						Number of segments:<input type="text" size=4 id="numSegmentsText" value="9"/><div class="slider" id="numSegmentsSlider"></div>
+						Creature width:<input type="text" id="creatureWidthText" size=8 value="1 - 30"/><div class="slider" id="creatureWidthSlider"></div>
+						Segment length:<input type="text" id="segmentLengthText" size=8 value="25 - 50"/><div class="slider" id="segmentLengthSlider"></div>
+						Joint rotation:<input type="text" id="jointRotationText" size=8 value="0 - 120"/><div class="slider" id="jointRotationSlider"></div>
+					</div>
+					<div id="starSettings">
+						Body size:<input type="text" size=4 id="bodysizeText" value="9"/><div class="slider" id="bodySizeSlider"></div>
+					</div>
+					<div id="quadSettings" >
+						Hind legs width:<input type="text" size=4 id="hindLegsWidthText" value="9"/><div class="slider" id="hindLegsWidthSlider"></div>
+						Hind legs length:<input type="text" size=4 id="hindLegsWidthText" value="9"/><div class="slider" id="hindLegsWidthSlider"></div>
+						Front legs width:<input type="text" size=4 id="hindLegsWidthText" value="9"/><div class="slider" id="hindLegsWidthSlider"></div>
+						Front legs length:<input type="text" size=4 id="hindLegsWidthText" value="9"/><div class="slider" id="hindLegsWidthSlider"></div>
+
+						Body width:<input type="text" id="creatureWidthText" size=8 value="1 - 30"/><div class="slider" id="creatureWidthSlider"></div>
+						Body length:<input type="text" id="creatureWidthText" size=8 value="1 - 30"/><div class="slider" id="creatureWidthSlider"></div>
+
+						Head width:<input type="text" id="creatureWidthText" size=8 value="1 - 30"/><div class="slider" id="creatureWidthSlider"></div>
+						Head length:<input type="text" id="creatureWidthText" size=8 value="1 - 30"/><div class="slider" id="creatureWidthSlider"></div>
+
+						Tail width:<input type="text" id="creatureWidthText" size=8 value="1 - 30"/><div class="slider" id="creatureWidthSlider"></div>
+						Tail length:<input type="text" id="creatureWidthText" size=8 value="1 - 30"/><div class="slider" id="creatureWidthSlider"></div>
+
+						Segment length:<input type="text" id="segmentLengthText" size=8 value="25 - 50"/><div class="slider" id="segmentLengthSlider"></div>
+						Joint rotation:<input type="text" id="jointRotationText" size=8 value="0 - 120"/><div class="slider" id="jointRotationSlider"></div>
+					</div>
+					<div id="generalCreatureSettings">
+						Creature speed:<input type="text" id="wormSpeedText" size=8 value="3 - 8"/><div class="slider" id="wormSpeedSlider"></div>
+						Steps per creature:<input type="text" size=8 id="creatureStepsText" value="100 - 500"/><div class="slider" id="creatureStepsSlider"></div>
+					</div>
+				</div>
+				
+
+				<h3><a href="#">World Settings</a></h3>
+				<div id="worldSettings">
+					Gravity:<input type="text" size=4 id="gravityText" value="1g"/><div class="slider" id="gravitySlider"></div>
+				</div>
+
+				<h3><a href="#">Genetic Settings</a></h3>
+				<div id="geneticSettings">
+					Population size:<input type="text" size=4 id="popsize" value="20"/></br>
+					Mutation chance:<input type="text" size=4 id="mutatechance" value="0.05"/></br>
+					Mutation amount:<input type="text" size=4 id="mutateamount" value="0.25"/></br>
+					Succesful parents cutoff:<input type="text" size=4 id="parentcutoff" value="0.25"/></br>
+					Kill parents:<input type="checkbox" id="killparents" checked /></span></br>
+					Start with identicals:<input type="checkbox" id="useidenticals" /></br>
+					Seed DNA:<input type="text" size=20 id="seed"/></br>
+					Selection Type: </br>
+								<input type="radio" class="choice" id="selectionType" name="selectionType" value="elite" onclick="Settings.setSelectionType(this);" checked/> Elite
+								<input type="radio" class="choice" id="selectionType" name="selectionType" value="roulette" onclick="Settings.setSelectionType(this);" /> Roulette
+				</div>
+
+
+			</div>
+
+			<div id="mainDiv">
+				<div id="controlDiv">
+					<a class="controlbutton" id="play" href="#" onclick="c.play(); return false;" ></a>
+					<a class="controlbutton" id="faster" href="#" onclick="c.faster(); return false;" ></a>
+					<a class="controlbutton" id="fastest" href="#" onclick="c.fastest(); return false;" ></a>
+					<a class="controlbutton" id="pause" href="#" onclick="c.pause(); return false;" ></a>
+					<a class="controlbutton" id="slower" href="#" onclick="c.slower(); return false;" ></a>
+					<a class="controlbutton" id="reset" href="#" onclick="c.reset(); return false;" ></a>
+
+					<a id="save" href="#" onclick="v.showDNA(false,null);return false;"></a>
+					<a id="fullrender" href="#" onclick="View.setBackground('full');return false;"></a>
+					<a id="wirerender" href="#" onclick="View.setBackground('wire');return false"></a>
+					<a id="onecreature" href="#" onclick="Settings.concurrentCreatures = 1;return false"></a>
+					<a id="fivecreature" href="#" onclick="Settings.concurrentCreatures = 5;return false"></a>
+
+				</div>
+
+				<div id="canvasDiv" class="d">
+					<div id="mainInfo"></div>
+					<div id="currentFitnessInfo" ></div>
+					<canvas width="700" height="400" id="canvas""></canvas>
+					<div id="finishingGenerationText" ></div>
+					<div id="zoomSlider" class="slider"></div>
+
+				</div>
+
+
+			</div>
+			<div id="log" class="dropshadow roundedcorners">
+			</div>
+			<div id="individualdnaDialog" title="Selected DNA">
+				<p>Here is the dna:</p>
+			</div>
+		</div>
+		<div id="data">
+			<div id="generationlogDiv" class="dropshadow roundedcorners">
+				<textarea id="generationlog">Generation data:
+				</textarea>
+
+			</div>
+			<div id="graph" class="dropshadow roundedcorners">Loading graph...</div>
+		</div>
+		<div id="footer" class="dropshadow">
+			this is the footer with all kinds of footer stuff on it
+		</div>
+		<div id="clearBottom">
+
+		</div>
+
+  	</div>
+
+
+
+
+</body>
+</html>

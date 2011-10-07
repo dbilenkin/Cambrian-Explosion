@@ -1,0 +1,179 @@
+<html>
+	<head>
+
+		<title>Evolving Worms</title>
+    
+    
+		<!-- libs -->
+		<!--[if IE]><script type="text/javascript" src="lib/excanvas.js"></script><![endif]-->
+    <script src="../../box2d/lib/prototype-1.6.0.2.js"></script>
+	<script src='lib/jscharts.js'></script>
+
+		<!-- box2djs -->
+    <script src='../../box2d/js/box2d/common/b2Settings.js'></script>
+    <script src='../../box2d/js/box2d/common/math/b2Vec2.js'></script>
+    <script src='../../box2d/js/box2d/common/math/b2Mat22.js'></script>
+    <script src='../../box2d/js/box2d/common/math/b2Math.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2AABB.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2Bound.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2BoundValues.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2Pair.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2PairCallback.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2BufferedPair.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2PairManager.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2BroadPhase.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2Collision.js'></script>
+    <script src='../../box2d/js/box2d/collision/Features.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2ContactID.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2ContactPoint.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2Distance.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2Manifold.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2OBB.js'></script>
+    <script src='../../box2d/js/box2d/collision/b2Proxy.js'></script>
+    <script src='../../box2d/js/box2d/collision/ClipVertex.js'></script>
+    <script src='../../box2d/js/box2d/collision/shapes/b2Shape.js'></script>
+    <script src='../../box2d/js/box2d/collision/shapes/b2ShapeDef.js'></script>
+    <script src='../../box2d/js/box2d/collision/shapes/b2BoxDef.js'></script>
+    <script src='../../box2d/js/box2d/collision/shapes/b2CircleDef.js'></script>
+    <script src='../../box2d/js/box2d/collision/shapes/b2CircleShape.js'></script>
+    <script src='../../box2d/js/box2d/collision/shapes/b2MassData.js'></script>
+    <script src='../../box2d/js/box2d/collision/shapes/b2PolyDef.js'></script>
+    <script src='../../box2d/js/box2d/collision/shapes/b2PolyShape.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/b2Body.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/b2BodyDef.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/b2CollisionFilter.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/b2Island.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/b2TimeStep.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2ContactNode.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2Contact.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2ContactConstraint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2ContactConstraintPoint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2ContactRegister.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2ContactSolver.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2CircleContact.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2NullContact.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2PolyAndCircleContact.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/contacts/b2PolyContact.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/b2ContactManager.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/b2World.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/b2WorldListener.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2JointNode.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2Joint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2JointDef.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2DistanceJoint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2DistanceJointDef.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2Jacobian.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2GearJoint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2GearJointDef.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2MouseJoint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2MouseJointDef.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2PrismaticJoint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2PrismaticJointDef.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2PulleyJoint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2PulleyJointDef.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2RevoluteJoint.js'></script>
+    <script src='../../box2d/js/box2d/dynamics/joints/b2RevoluteJointDef.js'></script>
+
+	
+	
+		<!-- my js -->
+	<script src='js/utilities.js'></script>	
+	<script src='js/graph.js'></script>	
+	<script src='js/jsga.js'></script>	
+	<script src='js/draw.js'></script>
+    <script src='js/creature.js'></script>
+    <script src='js/world.js'></script>
+
+		
+	<link href="style/movement.css" rel="stylesheet" type="text/css" />
+  </head>
+<body>
+	<div id="Title">Evolving Worms with a genetic algorithm using <a href="http://box2d-js.sourceforge.net/Box2d-js">box2d-js</a> inspired by <a href="http://boxcar2d.com/">BoxCar 2D</a> and <a href="http://www.nihilogic.dk/labs/evolving-images/">Mona Lisa + JavaScript + Canvas</a></div>
+	<div id="Subtitle"></div>
+  <div id="BODYBOX">
+  	<div class="LEFT"></div>
+    <div class="MIDDLE">
+    
+    	<canvas id="canvas" width='800' height='600' style="left:10px;"></canvas>
+		<div id="spacer"> </div>
+		<div id="graph">Loading graph...</div>
+	</div>
+	<div class="INFO">
+		<table>
+			<tr>
+				<td title="blah blah draw">Draw:</td><td><input type="checkbox" id="drawstep" checked /></span></td>
+			</tr>
+			<tr>
+				<td>Turbo:</td><td><input type="checkbox" id="turbo"/></td>
+			</tr>
+			<tr>
+				<td>Gravity:</td><td><input type="text" size=4 id="ygravity" value="1000"/></td>
+			</tr>
+			<tr>
+				<td>Friction:</td><td><input type="text" size=4 id="friction" value="1"/></td>
+			</tr>
+			<tr>
+				<td>Move right:</td><td><input type="checkbox" id="moveright" checked/></span></td>
+			</tr>	
+			<tr>
+				<td>Mutation chance:</td><td><input type="text" size=4 id="mutatechance" value="0.05"/></td>
+			</tr>
+			<tr>
+				<td>Mutation amount:</td><td><input type="text" size=4 id="mutateamount" value="0.5"/></td>
+			</tr>
+			<tr>
+				<td>Succesful parents cutoff:</td><td><input type="text" size=4 id="parentcutoff" value="0.25"/></td>
+			</tr>
+			<tr>
+				<td>Max Steps per worm:</td><td><input type="text" size=4 id="maxstepspercreature" value="1000"/></td>
+			</tr>
+			<tr>
+				<td>Min Steps per worm:</td><td><input type="text" size=4 id="minstepspercreature" value="100"/></td>
+			</tr>
+			<tr>
+				<td>Population size:</td><td><input type="text" size=4 id="popsize" value="20"/></td>
+			</tr>
+			<tr>
+				<td>Number of segments:</td><td><input type="text" size=4 id="numsegments" value="9"/></td>
+			</tr>
+			<tr>
+				<td>Worm width:</td><td>min: <input type="text" size=4 id="widthmin" value="5"/> max: <input type="text" size=4 id="widthmax" value="50"/></td>
+			</tr>
+			<tr>
+				<td>Segment length:</td><td>min: <input type="text" size=4 id="lengthmin" value="20"/> max: <input type="text" size=4 id="lengthmax" value="80"/></td>
+			</tr>
+			<tr>
+				<td>Kill parents:</td><td><input type="checkbox" id="killparents" checked /></span></td>
+			</tr>
+			<tr>
+				<td>Use Fourier:</td><td><input type="checkbox" id="usefourier" /></span></td>
+			</tr>
+			<tr>
+				<td>Start with identicals:</td><td><input type="checkbox" id="useidenticals" /></span></td>
+			</tr>
+			
+			<tr>
+				<td colspan="2">Background: </br>
+					<div id="backgroundGroup">
+						<input type="radio" id="backgroundChoice" name="backgroundChoice" value="simple.png" onclick="World.setBackground(this);" checked/> Simple
+						<input type="radio" id="backgroundChoice" name="backgroundChoice" value="abby.png" onclick="World.setBackground(this);" /> Abby's
+						<input type="radio" id="backgroundChoice" name="backgroundChoice" value="field.jpg" onclick="World.setBackground(this);"/> Photo
+					</div>
+				</td>
+			</tr>
+		</table>		
+		<br/>		
+		<input type="button" value="Evolve" onclick="World.start();" id="startbutton"/>
+		<input type="button" value="Pause" onclick="World.pause();" id="stopbutton"/>
+		<input type="button" value="Reset" onclick="World.reset();" id="reset"/><br/>
+		
+		Output:<br/>
+		<textarea style="width:300px;height:200px;" id="log"></textarea><br/>
+		<textarea style="width:300px;height:100px;" id="generationlog"></textarea><br/>
+	</div>
+	
+
+
+
+</body>
+</html>
