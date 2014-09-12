@@ -25,7 +25,7 @@ Creature = Class.create({
 		this.wormWidth = individual.wormWidth;
 	},
 
-	changeSpeed : function() {		
+	changeSpeed : function(p) {		
 		
 		for (var i=0; i<this.joints.length; i++) {
 			
@@ -40,9 +40,9 @@ Creature = Class.create({
 			this.joints[i].SetMotorSpeed(Math.sin((c.steps - this.startStep)/speed + offset) * rotation * this.speedMultiplier);
 		}
 		
-		if (this.body.m_position.x > this.originalX - c.xChange) {
-			c.xChange = this.originalX - this.body.m_position.x;
-			c.currentFittest = this;
+		if (this.body.m_position.x > this.originalX - p.xChange) {
+			p.xChange = this.originalX - this.body.m_position.x;
+			p.currentFittest = this;
 		}
 	},
 	
@@ -70,16 +70,16 @@ Creature = Class.create({
 });
 
 //class methods
-Creature.createCreature = function(individual) {
+Creature.createCreature = function(individual, w) {
 	
 	if (s.creatureType == "worm") {
-		return new WormCreature(individual);
+		return new WormCreature(individual, w);
 	} else if (s.creatureType == "ring") {
-		return new RingCreature(individual);
+		return new RingCreature(individual, w);
 	} else if (s.creatureType == "star") {
-		return new StarCreature(individual);
+		return new StarCreature(individual, w);
 	} else if (s.creatureType == "quadruped") {
-		return new QuadrupedCreature(individual);
+		return new QuadrupedCreature(individual, w);
 	}
 
 };

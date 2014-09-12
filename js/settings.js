@@ -64,6 +64,8 @@ Settings = {
 
 	//view
 	concurrentCreatures : 1,
+	renderType : 'wire',
+	backgroundChoice : 'wire',
 	
 	initialize : function() {
 		
@@ -147,13 +149,25 @@ Settings = {
 		}
 		
 	},
-
-	changeZoom : function(e) {
+	
+	changeZoom1 : function(e) {
+		Settings.changeZoom(e, c.worlds[0]);
+	},
+	
+	changeZoom2 : function(e) {
+		Settings.changeZoom(e, c.worlds[1]);
+	},
+	
+	changeZoom : function(e, w) {
+		var v = w.view;
 		v.wheelValue += Event.wheel(e);
 		v.zoom = Math.min(10, Math.max(.5, 1 - v.wheelValue/10));
-		v.yZoomAdjustment = w.groundHeight - w.groundHeight/v.zoom;
+		v.yZoomAdjustment = w.groundHeight + v.splitAdjustment - 
+			(w.groundHeight)/v.zoom;
 		v.xZoomAdjustment = 230 - 230/v.zoom;
 	}
+
+	
 };
 
 //shortcut for Settings
@@ -340,10 +354,10 @@ jQuery(document).ready(function() {
 		
 		Settings.concurrentCreatures = 5;
 		
-		v.renderType = "full";
+		s.renderType = "full";
 		jQuery("[name=backgroundChoice]").filter("[value=full]").attr("checked","checked");
 		
-		v.setBackground("full");
+		s.backgroundChoice = "full";
 	}	
 	
 	

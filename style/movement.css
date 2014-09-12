@@ -220,6 +220,15 @@ input {
 	position: absolute;
 	left: 545px;
 }
+
+#splitpopulation {
+	background-image:url('../images/fivecreature.png');
+	background-repeat: no-repeat;
+	width: 60px;
+	height: 46px;
+	position: absolute;
+	left: 610px;
+}
  
 #canvasDiv {
 	float: left;
@@ -230,6 +239,14 @@ input {
 }
 
 #canvas {
+	padding:0; 
+	margin: 5px; 
+	background-position: 0 0;
+	background-color: #133B09;
+}
+
+#canvas2 {
+	display: none;
 	padding:0; 
 	margin: 5px; 
 	background-position: 0 0;

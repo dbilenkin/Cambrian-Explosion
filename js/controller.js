@@ -1,8 +1,4 @@
 Controller = {
-	
-	//position variables
-	xChange : 0,
-	yChange : 0,
 
 	//time and step variables
 	timer : null,
@@ -19,35 +15,58 @@ Controller = {
 	minStepsPerCreature : 200,
 	stepDrawFrequency : 1,
 	started  : false,
+	populations : [],
+	worlds : [],
+	split : false,
 	
 	start : function() {
 		
 		//Initializes user settings
 		Settings.initialize();
-		View.initialize();
-		World.create();
+		
+		//World.create();
+		var world = new World({gravity : 1000, canvasString : "canvas"});
+		this.worlds.push(world);
+		
+		
 		
 		this.started = true;
-		this.concurrentCreatures = s.concurrentCreatures;
-		this.creatureGroup = 0;
-		this.creatureGroupCount = 0;
-		this.currentCreatures = [];
-		this.creatureCount = 0;
-		
-		this.currentDistanceChange = 0;
-		this.individualCount = 0;
-		
-		this.currentFittest = 0;
-	
+
 		this.stepTimer = (new Date()).getTime();
 		
 		if (this.timer) clearTimeout(this.timer);
 		
 		
-		this.population = new Population(this.popSize);
 		
-		this.startGenerations();
+		world.populations[0].startGenerations();
+		
+		this.startTime = (new Date()).getTime();
+		this.step();
+		//world.view.logResults();
 
+	},
+	
+	setBackground : function(background) {
+		for (var i = 0; i < this.worlds.length; i++) {
+			this.worlds[i].view.setBackground(background);
+		}
+			
+	},
+	
+	splitPopulation : function() {
+		c.split = true;
+		
+		var world = new World({gravity : 1000, canvasString : "canvas2"});
+		this.worlds.push(world);
+		
+		$('canvas').height = 190;
+		$('canvas2').style.display = 'block';
+		
+		this.worlds[0].view.splitAdjustment = -348/2;
+		this.worlds[1].view.splitAdjustment = -348/2;
+		//this.worlds[0].groundHeight = 348/2;
+		world.populations[0].startGenerations();
+		
 	},
 		
 	testCreature : function() {
@@ -62,114 +81,9 @@ Controller = {
 	
 	},
 	
-	startGenerations : function() {
-		
-		this.individualCount = 0;
-		
-		this.creatureCount = this.popSize;
-		this.creatureGroupCount = this.concurrentCreatures;
-		this.creatureGroup = 0;
-		
-		this.createCurrentCreatures();
 	
-		//World.testCreature();
-		this.startTime = (new Date()).getTime();
-		this.step();
-		v.logResults();
-		
-	},
 	
-	createCurrentCreatures : function() {
-		var individuals = this.population.individuals;
-		var startCreature = this.population.popSize - this.creatureCount;
-		var endCreature = Math.min(individuals.length, this.popSize - this.creatureCount + this.concurrentCreatures);
-		for (var i = startCreature; i < endCreature; i++) {
-			this.currentCreatures[i] = Creature.createCreature(individuals[i]);
-			this.currentCreatures[i].startStep = this.steps;
-		
-		}
 	
-	},
-	
-	runGenerations : function() {
-		var currentGen = c.population.genCount;
-		var currentGroup = c.creatureGroup;
-		var startCreature = Math.max(0, c.popSize - c.creatureCount - c.concurrentCreatures);
-		var endCreature = Math.min(c.currentCreatures.length, c.population.popSize - c.creatureCount + c.concurrentCreatures);
-		for (var i = startCreature; i < endCreature; i++) {
-			if (currentGen != c.population.genCount || currentGroup != c.creatureGroup) break;
-			c.individualCount = i;
-			if (c.currentCreatures[i])
-				c.runCreatureGenerations();
-		}
-	},
-	
-	runCreatureGenerations : function() {
-		var currentCreatures = this.currentCreatures;
-		var individualCount = this.individualCount;
-
-		var checkpoint = this.minStepsPerCreature * s.lengthMax * 
-			Math.pow(1.1,currentCreatures[individualCount].stepInterval)/500;
-		if (currentCreatures[individualCount].checkpointDistanceChange() <  checkpoint || 
-				currentCreatures[individualCount].startStep + this.maxStepsPerCreature < this.steps) {
-			
-			var currentFitness = 0;
-			currentCreatures[individualCount].distanceTraveled = currentCreatures[individualCount].distanceChange();
-			
-			if (!currentCreatures[individualCount].flippedUpsideDown()) {
-				currentFitness = currentCreatures[individualCount].distanceTraveled;	
-			} 
-			
-			c.population.individuals[individualCount].fitness  = currentFitness;
-			v.logField.innerHTML += "<a href='#' onclick='v.showDNA(true,"+individualCount+");return false'>Creature " + individualCount + " fitness: " + 
-				Math.floor(currentFitness) + "</a></br>";
-	
-			currentCreatures[individualCount].destroy(w.world);	
-			currentCreatures[individualCount] = null;
-			this.creatureCount--;
-			this.creatureGroupCount--;
-	
-			if (this.creatureGroupCount == 0 || this.creatureCount == 0) {
-				
-				if (this.creatureCount == 0) {
-					var fittest = Math.floor(this.population.getFittest().fitness);
-					var average = Math.floor(this.population.getAverageFitness());
-					
-					v.graph.update(this.population.genCount,fittest, average);
-					
-					v.generationLogField.value += "\r\nGen. " + this.population.genCount + ": Fittest: " + fittest + ", Average: " + average;
-					
-					this.population.breed();
-					this.individualCount = 0;
-					
-					this.population.updateLog();
-					
-					this.creatureCount = this.population.popSize;
-					
-					v.checkFinishGenerationText();
-					
-				} else {					
-					this.creatureGroup++;				
-				}
-				
-				if (v.drawStep == false) {
-					this.concurrentCreatures = this.population.popSize;
-				} else {
-					this.concurrentCreatures = s.concurrentCreatures;
-				}
-				
-
-				this.createCurrentCreatures();
-				this.xChange = 0;
-				this.creatureGroupCount = this.concurrentCreatures;
-			}
-			
-		} else {
-			currentCreatures[individualCount].stepInterval++;
-			currentCreatures[individualCount].distanceTraveled = currentCreatures[individualCount].distanceChange();
-		}
-
-	},
 	
 	pause : function() {
 		if (!this.paused) {
@@ -243,26 +157,37 @@ Controller = {
 		var timeStep = 1.0/60;
 		var iteration = 10;
 
-		for (var i = 0, len = currentCreatures.length; i<len; i++)
-			if(currentCreatures[i])
-				currentCreatures[i].changeSpeed();
 		
-
 		
-		w.world.Step(timeStep, iteration);
-		
+		var numWorlds = c.worlds.length;
 		
 		var stepTimeout = 100 - c.speed;
 		
 		//var stepDrawFrequency = Math.ceil(60/c.stepsPerSecond);
-		
-		if (c.steps % c.stepDrawFrequency == 0) {
-			if (v.drawStep) {
-				
-				v.drawWorld(currentCreatures);
 
-			} else {
-				stepTimeout = 0;
+		for (var i = 0; i < numWorlds; i++) {
+			//For now there is just one population per world
+			var population = c.worlds[i].populations[0];
+			for (var j = 0, len = population.currentCreatures.length; j<len; j++) {
+				if(population.currentCreatures[j])
+					population.currentCreatures[j].changeSpeed(population);
+			}
+
+			c.worlds[i].world.Step(timeStep, iteration);
+			
+			if (c.steps % c.stepDrawFrequency == 0) {
+				if (v.drawStep) {
+					
+					c.worlds[i].view.drawWorld(population.currentCreatures);
+
+				} else {
+					stepTimeout = 0;
+				}
+			}
+			
+			if (c.steps % c.minStepsPerCreature == 0) {
+				c.worlds[i].populations[0].runGenerations();
+				//setTimeout(function() {c.worlds[0].populations[0].runGenerations();}, 0);
 			}
 		}
 		
@@ -275,9 +200,7 @@ Controller = {
 
 		}		
 		
-		if (c.steps % c.minStepsPerCreature == 0) {
-			setTimeout(c.runGenerations, 0);
-		}
+		
 		
 		c.timer = setTimeout(c.step, stepTimeout);
 	}

@@ -1,12 +1,29 @@
 Population = Class.create({
 
-	initialize : function(popSize) {
+	initialize : function(popSize, world) {
 		
-		this.popSize =  popSize;
+		this.world = world;
+		//position variables
+		this.xChange = 0;
+		this.yChange = 0;
+		
+		this.popSize = popSize;
 		this.genCount = 0;
 		this.individuals = [];
 		this.previousIndividuals = [];
 		this.previousIndividualsSize = 5;
+		
+		this.concurrentCreatures = s.concurrentCreatures;
+		this.creatureGroup = 0;
+		this.creatureGroupCount = 0;
+		this.currentCreatures = [];
+		this.creatureCount = 0;
+		
+		this.currentDistanceChange = 0;
+		this.individualCount = 0;
+		
+		this.currentFittest = 0;
+		this.goLeft = false;
 	
 		var original;
 		if (s.seedDNA) {
@@ -24,10 +41,118 @@ Population = Class.create({
 		}
 	},
 	
+	startGenerations : function() {
+		
+		this.individualCount = 0;
+		
+		this.creatureCount = c.popSize;
+		this.creatureGroupCount = this.concurrentCreatures;
+		this.creatureGroup = 0;
+		
+		this.createCurrentCreatures();
 	
+		//World.testCreature();
+		
+		
+	},
+	
+	createCurrentCreatures : function() {
+		var individuals = this.individuals;
+		var startCreature = c.popSize - this.creatureCount;
+		var endCreature = Math.min(individuals.length, this.popSize - this.creatureCount + this.concurrentCreatures);
+		for (var i = startCreature; i < endCreature; i++) {
+			this.currentCreatures[i] = Creature.createCreature(individuals[i], this.world);
+			this.currentCreatures[i].startStep = c.steps;
+		
+		}
+	
+	},
+	
+	runGenerations : function() {
+		var currentGen = this.genCount;
+		var currentGroup = this.creatureGroup;
+		var startCreature = Math.max(0, c.popSize - this.creatureCount - this.concurrentCreatures);
+		var endCreature = Math.min(this.currentCreatures.length, this.popSize - this.creatureCount + this.concurrentCreatures);
+		for (var i = startCreature; i < endCreature; i++) {
+			if (currentGen != this.genCount || currentGroup != this.creatureGroup) break;
+			this.individualCount = i;
+			if (this.currentCreatures[i])
+				this.runCreatureGenerations();
+		}
+	},
+	
+	runCreatureGenerations : function() {
+		var currentCreatures = this.currentCreatures;
+		var individualCount = this.individualCount;
+
+		var checkpoint = c.minStepsPerCreature * s.lengthMax * 
+			Math.pow(1.1,currentCreatures[individualCount].stepInterval)/500;
+		if (currentCreatures[individualCount].checkpointDistanceChange() <  checkpoint || 
+				currentCreatures[individualCount].startStep + c.maxStepsPerCreature < c.steps) {
+			
+			var currentFitness = 0;
+			currentCreatures[individualCount].distanceTraveled = currentCreatures[individualCount].distanceChange();
+			
+			if (!currentCreatures[individualCount].flippedUpsideDown()) {
+				if (this.goLeft) {
+					currentFitness = currentCreatures[individualCount].distanceTraveled;	
+				}
+				
+			} 
+			
+			this.individuals[individualCount].fitness  = currentFitness;
+			v.logField.innerHTML += "<a href='#' onclick='v.showDNA(true,"+individualCount+");return false'>Creature " + individualCount + " fitness: " + 
+				Math.floor(currentFitness) + "</a></br>";
+	
+			currentCreatures[individualCount].destroy(this.world.world);	
+			currentCreatures[individualCount] = null;
+			this.creatureCount--;
+			this.creatureGroupCount--;
+	
+			if (this.creatureGroupCount == 0 || this.creatureCount == 0) {
+				
+				if (this.creatureCount == 0) {
+					var fittest = Math.floor(this.getFittest().fitness);
+					var average = Math.floor(this.getAverageFitness());
+					
+					v.graph.update(this.genCount,fittest, average);
+					
+					v.generationLogField.value += "\r\nGen. " + this.genCount + ": Fittest: " + fittest + ", Average: " + average;
+					
+					this.breed();
+					this.individualCount = 0;
+					
+					this.updateLog();
+					
+					this.creatureCount = this.popSize;
+					
+					v.checkFinishGenerationText();
+					
+				} else {					
+					this.creatureGroup++;				
+				}
+				
+				if (v.drawStep == false) {
+					this.concurrentCreatures = this.popSize;
+				} else {
+					this.concurrentCreatures = s.concurrentCreatures;
+				}
+				
+
+				this.createCurrentCreatures();
+				this.xChange = 0;
+				this.creatureGroupCount = this.concurrentCreatures;
+			}
+			
+		} else {
+			currentCreatures[individualCount].stepInterval++;
+			currentCreatures[individualCount].distanceTraveled = currentCreatures[individualCount].distanceChange();
+		}
+
+	},
 	
 	destroy : function() {
-		this.individuals = [];
+		this.individuals = null;
 	},
 	
 	createIndividual : function(dna1, dna2) {

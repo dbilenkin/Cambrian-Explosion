@@ -1,6 +1,6 @@
 WormCreature = Class.create(Creature, {
 	
-	initialize : function($super, individual) {
+	initialize : function($super, individual, w) {
 		
 		//calling Creature constructor
 		$super(individual);
@@ -36,7 +36,7 @@ WormCreature = Class.create(Creature, {
 				[[0, 0], 
 				[0, this.wormWidth], 
 				[this.dna[this.lengthGeneStart+i]/-1, this.wormWidth], 
-				[this.dna[this.lengthGeneStart+i]/-1, 0]],false, this.color, -1, 1);
+				[this.dna[this.lengthGeneStart+i]/-1, 0]],false, this.color, -1, 0);
 										
 			var x = this.segments[i].m_position.x - this.dna[this.lengthGeneStart+i]/2;
 			var y = this.segments[i-1].GetCenterPosition().y;
@@ -54,20 +54,20 @@ WormCreature = Class.create(Creature, {
 	},
 	
 	
-	draw : function(context, renderType) {
+	draw : function(v) {
 		
 		//draw.drawTail(this.segments[0].GetShapeList(), this.wormWidth, context, renderType);
 		
 		for (var i = 0; i < s.numSegments-1; i++) {	
-			v.drawSegment(this.segments[i].GetShapeList(), this.wormWidth, context, renderType);	
+			v.drawSegment(this.segments[i].GetShapeList(), this.wormWidth);	
 		}
-		v.drawSegment(this.segments[s.numSegments-1].GetShapeList(), this.wormWidth, context, renderType);
+		v.drawSegment(this.segments[s.numSegments-1].GetShapeList(), this.wormWidth);
 		
 		for (var i = 0; i < s.numSegments-1; i++) {	
 			//this.drawJoint([this.joints[i].GetShapeList(), this.joints[i+1].GetShapeList()], context);
 		}
 		
-		v.drawHead(this.segments[s.numSegments-1].GetShapeList(), this.wormWidth, context, renderType);
+		v.drawHead(this.segments[s.numSegments-1].GetShapeList(), this.wormWidth);
 		
 	}
 	

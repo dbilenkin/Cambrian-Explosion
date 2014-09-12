@@ -1,10 +1,18 @@
-World = {
+World = Class.create({
 
 	ygravity : 1000,
 	friction : 0,
 	groundHeight : 348,
+	view : null,
+	populations : [],
 
-	create : function() {
+	initialize : function(settings) {
+		
+		this.ygravity = settings.gravity;
+		this.friction = 0;
+		this.groundHeight = 348;
+		
+		
 		var worldAABB = new b2AABB();
 		worldAABB.minVertex.Set(-1000, -100);
 		worldAABB.maxVertex.Set(10000, 900);
@@ -22,6 +30,13 @@ World = {
 		this.createBox(-1000, 0, 10, 1000);
 		this.createBox(10000, 0, 10, 1000);
 		
+		this.populations = [];
+		var population = new Population(c.popSize, this);
+
+		this.populations.push(population);
+		
+		this.view = new View(settings.canvasString, population);
+		v = this.view;
 	},
 	
 	createGround : function(world) {
@@ -123,7 +138,4 @@ World = {
 		return this.world.CreateJoint(axel);
 	}
 
-};
-
-//shortcut for World
-w = World;
+});

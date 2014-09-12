@@ -152,19 +152,21 @@
 					<a class="controlbutton" id="reset" href="#" onclick="c.reset(); return false;" ></a>
 
 					<a id="save" href="#" onclick="v.showDNA(false,null);return false;"></a>
-					<a id="fullrender" href="#" onclick="View.setBackground('full');return false;"></a>
-					<a id="wirerender" href="#" onclick="View.setBackground('wire');return false"></a>
+					<a id="fullrender" href="#" onclick="c.setBackground('full');return false;"></a>
+					<a id="wirerender" href="#" onclick="c.setBackground('wire');return false"></a>
 					<a id="onecreature" href="#" onclick="Settings.concurrentCreatures = 1;return false"></a>
 					<a id="fivecreature" href="#" onclick="Settings.concurrentCreatures = 5;return false"></a>
+					<a id="splitpopulation" href="#" onclick="c.splitPopulation();return false"></a>
 
 				</div>
 
 				<div id="canvasDiv" class="d">
 					<div id="mainInfo"></div>
 					<div id="currentFitnessInfo" ></div>
-					<canvas width="700" height="400" id="canvas""></canvas>
+					<canvas width="700" height="400" id="canvas"></canvas>
 					<div id="finishingGenerationText" ></div>
 					<div id="zoomSlider" class="slider"></div>
+					<canvas width="700" height="190" id="canvas2"></canvas>
 
 				</div>
 

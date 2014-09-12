@@ -1,10 +1,12 @@
-View = {
-	ctx : '',
-	
+View = Class.create({
+
+	ctx : null,
 	yZoomAdjustment : 0,
 	xZoomAdjustment : 0,
 	wheelValue : 0,
 	zoom: 1,
+	
+	splitAdjustment : 0,
 	
 	canvasWidth : 700,
 	canvasHeight : 400,
@@ -26,25 +28,33 @@ View = {
 	currentFitnessInfo : '',
 	
 	renderType: 'wire',
+	canvasElem: null,
+	
+	population : null,
 		
-	initialize : function() {
+	initialize : function(canvasString, population) {
 
-		var canvasElm = $('canvas');
-		this.ctx = canvasElm.getContext('2d');	
+		this.population = population;
 		this.graph = new Graph(624, 366);
+		this.canvasElem = $(canvasString);
+		this.ctx = this.canvasElem.getContext('2d');	
+		
 
-		this.canvasWidth = parseInt(canvasElm.width);
-		this.canvasHeight = parseInt(canvasElm.height);
-		this.canvasTop = parseInt(canvasElm.style.top);
-		this.canvasLeft = parseInt(canvasElm.style.left);
+		this.canvasWidth = parseInt(this.canvasElem.width);
+		this.canvasHeight = parseInt(this.canvasElem.height);
+		this.canvasTop = parseInt(this.canvasElem.style.top);
+		this.canvasLeft = parseInt(this.canvasElem.style.left);
 		
 		this.logField = $("log");
 		this.generationLogField = $("generationlog");
 		this.mainInfo = $("mainInfo");
 		this.currentFitnessInfo = $("currentFitnessInfo");
 		
-		Event.observe("canvas", "mousewheel", Settings.changeZoom, false);
-		Event.observe("canvas", "DOMMouseScroll", Settings.changeZoom, false); // Firefox
+		Event.observe("canvas", "mousewheel", Settings.changeZoom1, false);
+		Event.observe("canvas", "DOMMouseScroll", Settings.changeZoom1, false); // Firefox
+		
+		Event.observe("canvas2", "mousewheel", Settings.changeZoom2, false);
+		Event.observe("canvas2", "DOMMouseScroll", Settings.changeZoom2, false); // Firefox
 		
 		this.butterfly1 = new Image();
 		this.butterfly2 = new Image();
@@ -66,14 +76,17 @@ View = {
 	    this.butterfly3X = Math.random() * 20 + 600;
 	    this.butterfly3Y = Math.random() * 100 + 150;
 	    
-	
+	    this.renderType = s.renderType;
+	    this.setBackground(s.backgroundChoice);
 	},
+	
+	
 	
 	setBackground : function(choice) {
 
 		if (choice == "none") {
 			this.drawStep = false;
-			$('canvas').style.display = 'none';
+			this.canvasElem.style.display = 'none';
 			
 		} else {
 			if (this.drawStep == false) {
@@ -81,13 +94,13 @@ View = {
 				this.drawStep = true;
 			}			
 			if (choice == "wire") {
-				$('canvas').style.backgroundImage = "none";
-				$('canvas').style.backgroundColor = "#002200";
+				this.canvasElem.style.backgroundImage = "none";
+				this.canvasElem.style.backgroundColor = "#002200";
 			} else {
-				$('canvas').style.backgroundColor = "#000000";
-				$('canvas').style.background = "-webkit-gradient(linear, left top, left bottom, color-stop(0%,#000000),color-stop(86%,#00BFFF),color-stop(87%,#006600),color-stop(100%,#000000))";
-				$('canvas').style.background = "-moz-linear-gradient(center bottom,#000000 0%,#006600 13%,#00BFFF 14%,#000000 100%)";
-				$('canvas').style.backgroundRepeat = "repeat-x";
+				this.canvasElem.style.backgroundColor = "#000000";
+				this.canvasElem.style.background = "-webkit-gradient(linear, left top, left bottom, color-stop(0%,#000000),color-stop(86%,#00BFFF),color-stop(87%,#006600),color-stop(100%,#000000))";
+				this.canvasElem.style.background = "-moz-linear-gradient(center bottom,#000000 0%,#006600 13%,#00BFFF 14%,#000000 100%)";
+				this.canvasElem.style.backgroundRepeat = "repeat-x";
 			}
 			this.renderType = choice;
 		}
@@ -98,7 +111,7 @@ View = {
 		
 		if (this.drawStep == true) {
 			finishingGenerationText.innerHTML = "";
-			$('canvas').style.display = 'block';
+			this.canvasElem.style.display = 'block';
 			
 		} 
 	},
@@ -121,8 +134,9 @@ View = {
 	},
 		
 	logResults : function() {
-
-		var genCount = c.population.genCount;
+		
+		var p = c.w.population;
+		var genCount = p.genCount;
 		
 		var generationTime = 0;
 		if (genCount > 0) generationTime = c.totalTime/genCount;
@@ -134,15 +148,16 @@ View = {
 		
 		
 		v.mainInfo.innerHTML = info;
-		v.currentFitnessInfo.innerHTML = "current fitness: " + Math.floor(c.xChange) * -1;
+		v.currentFitnessInfo.innerHTML = "current fitness: " + Math.floor(p.xChange) * -1;
 		
 		v.logTimer = setTimeout(v.logResults, 100);
 	
 	},
 	
 	drawWorld : function(currentCreatures) {
-		var xOffset = this.xBackgroundOffset + c.xChange/this.zoom + this.xZoomAdjustment;
-		var yOffset = this.yBackgroundOffset + c.yChange/this.zoom + this.yZoomAdjustment;
+		var w = this.population.world;
+		var xOffset = this.xBackgroundOffset + this.population.xChange/this.zoom + this.xZoomAdjustment;
+		var yOffset = this.yBackgroundOffset + (this.population.yChange - this.splitAdjustment)/this.zoom + this.yZoomAdjustment;
 		
 		this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 		
@@ -164,39 +179,39 @@ View = {
 		} else {
 			
 			for (var i = -5; i < 20; i++) {
-				if ((700*i + c.xChange)/this.zoom > -700 && (100 + 700*i + c.xChange)/this.zoom < 700) {
+				if ((700*i + this.population.xChange)/this.zoom > -700 && (100 + 700*i + this.population.xChange)/this.zoom < 700) {
 					
-			      this.ctx.drawImage(this.butterfly1,(this.butterfly1X + 700*i + c.xChange)/this.zoom + this.xZoomAdjustment,
-			    		  (this.butterfly1Y + c.yChange)/this.zoom + this.yZoomAdjustment, 
+			      this.ctx.drawImage(this.butterfly1,(this.butterfly1X + 700*i + this.population.xChange)/this.zoom + this.xZoomAdjustment,
+			    		  (this.butterfly1Y + this.population.yChange)/this.zoom + this.yZoomAdjustment, 
 			    		  butterfly1Size/this.zoom, butterfly1Size/this.zoom);
 			      
-			      this.ctx.drawImage(this.butterfly2,(this.butterfly2X + 700*i + c.xChange)/this.zoom + this.xZoomAdjustment,
-			    		  (this.butterfly2Y + c.yChange)/this.zoom + this.yZoomAdjustment, 
+			      this.ctx.drawImage(this.butterfly2,(this.butterfly2X + 700*i + this.population.xChange)/this.zoom + this.xZoomAdjustment,
+			    		  (this.butterfly2Y + this.population.yChange)/this.zoom + this.yZoomAdjustment, 
 			    		  butterfly2Size/this.zoom, butterfly2Size/this.zoom);
 			      
-			      this.ctx.drawImage(this.butterfly3,(this.butterfly3X + 700*i + c.xChange)/this.zoom + this.xZoomAdjustment,
-			    		  (this.butterfly3Y + c.yChange)/this.zoom + this.yZoomAdjustment, 
+			      this.ctx.drawImage(this.butterfly3,(this.butterfly3X + 700*i + this.population.xChange)/this.zoom + this.xZoomAdjustment,
+			    		  (this.butterfly3Y + this.population.yChange)/this.zoom + this.yZoomAdjustment, 
 			    		  butterfly3Size/this.zoom, butterfly3Size/this.zoom);
 				}
 		    };
 			
-			$('canvas').style.backgroundPosition = xOffset + " " + yOffset;
+			this.canvasElem.style.backgroundPosition = xOffset + " " + yOffset;
 			var backgroundSize = 100/this.zoom;
-			$('canvas').style.backgroundSize = backgroundSize + '%';
-			$('canvas').style.MozBackgroundSize = backgroundSize + '%';
+			this.canvasElem.style.backgroundSize = backgroundSize + '%';
+			this.canvasElem.style.MozBackgroundSize = backgroundSize + '%';
 		
 		}
 		
 		for (var i = 0, len = currentCreatures.length; i<len; i++)
 			if(currentCreatures[i])
-				currentCreatures[i].draw(this.ctx, this.renderType);
+				currentCreatures[i].draw(this);
 		
 	},
 	
 	drawCircle :  function(shape, context, renderType) {
 		
-		var xChange = c.xChange;
-		var yChange = c.yChange;
+		var xChange = this.population.xChange;
+		var yChange = this.population.yChange;
 		var zoom = this.zoom;
 		var xZoomAdjustment = this.xZoomAdjustment;
 		var yZoomAdjustment = this.yZoomAdjustment;
@@ -236,10 +251,12 @@ View = {
 		
 	},
 	
-	drawSegment : function(shape, width, context, renderType) {
+	drawSegment : function(shape, width) {
 		
-		var xChange = c.xChange;
-		var yChange = c.yChange;
+		var context = this.ctx;
+		var renderType = this.renderType;
+		var xChange = this.population.xChange;
+		var yChange = this.population.yChange;
 		var zoom = this.zoom;
 		var xZoomAdjustment = this.xZoomAdjustment;
 		var yZoomAdjustment = this.yZoomAdjustment;
@@ -327,11 +344,13 @@ View = {
 	
 	},
 	
-	drawHead : function(head, width, context, renderType) {
-	
+	drawHead : function(head, width) {
+		var context = this.ctx;
+		var renderType = this.renderType;
+		
 		if (renderType != "wire") {
-			var xChange = c.xChange;
-			var yChange = c.yChange;
+			var xChange = this.population.xChange;
+			var yChange = this.population.yChange;
 			var zoom = this.zoom;
 			var xZoomAdjustment = this.xZoomAdjustment;
 			var yZoomAdjustment = this.yZoomAdjustment;
@@ -380,8 +399,8 @@ View = {
 	
 	drawShape : function(shape, context) {
 		
-		var xChange = c.xChange;
-		var yChange = c.yChange;
+		var xChange = this.population.xChange;
+		var yChange = this.population.yChange;
 		var zoom = this.zoom;
 		var xZoomAdjustment = this.xZoomAdjustment;
 		var yZoomAdjustment = this.yZoomAdjustment;
@@ -456,8 +475,7 @@ View = {
 		context.stroke();
 	}
 		
-};
+});
 
-//shortcut for View
-v = View;
+
 
